@@ -1,0 +1,22 @@
+{
+    "compilerOptions": {
+        "target": "ES2022",
+        "module": "commonjs",
+        "strict": true,
+        "esModuleInterop": true,
+        "resolveJsonModule": true,
+        "baseUrl": ".",
+        "paths": {
+            "@fixtures": ["fixtures/index.ts"],
+            "@fixtures/*": ["fixtures/*"],
+            "@helpers/*": ["utils/*"]
+        },
+        "outDir": "dist",
+        "rootDir": ".",
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true,
+        "ignoreDeprecations": "6.0"
+    },
+    "include": ["**/*.ts"],
+    "exclude": ["node_modules", "dist", "playwright-report", "test-results"]
+}
