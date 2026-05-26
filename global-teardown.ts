@@ -15,9 +15,10 @@
  * regenerated from the full merged list.
  *
  * MongoDB collection map (from Standard.Proxy.Core entities):
- *   provider   → providers    (standalone collection)
- *   integrator → integrators  (standalone collection)
- *   api-config → apis         (ApiVersions + ProviderApiEndpoints are embedded subdocs)
+ *   provider      → providers      (standalone collection)
+ *   integrator    → integrators    (standalone collection)
+ *   api-config    → apis           (ApiVersions + ProviderApiEndpoints are embedded subdocs)
+ *   mapper-config → mapperConfigs  (standalone collection)
  */
 
 import * as fs from 'fs'
@@ -65,6 +66,7 @@ function generateScript(
     const providers = byType(resources, 'provider')
     const integrators = byType(resources, 'integrator')
     const apiConfigs = byType(resources, 'api-config')
+    const mapperConfigs = byType(resources, 'mapper-config')
 
     const lines: string[] = [
         `// MongoDB cleanup script`,
@@ -113,6 +115,13 @@ function generateScript(
         lines.push(`//    created=${r.createdAt}`)
     }
 
+    lines.push(`//`)
+    lines.push(`//  Mapper Configs (${mapperConfigs.length})`)
+    for (const r of mapperConfigs) {
+        lines.push(`//    id=${r.id}  "${r.description}"`)
+        lines.push(`//    created=${r.createdAt}`)
+    }
+
     lines.push(``)
     lines.push(
         `// ─── Cleanup queries ─────────────────────────────────────────────────────────`
@@ -141,6 +150,22 @@ function generateScript(
         lines.push(`    _id: {`)
         lines.push(`        $in: [`)
         lines.push(toObjectIdList(integrators))
+        lines.push(`        ],`)
+        lines.push(`    },`)
+        lines.push(`})`)
+    }
+
+    if (mapperConfigs.length > 0) {
+        lines.push(``)
+        lines.push(
+            `// Mapper configs (delete before api-configs so the references go away first)`
+        )
+        lines.push(
+            `db.getCollection(COLLECTION_PREFIX + 'mapperConfigs').deleteMany({`
+        )
+        lines.push(`    _id: {`)
+        lines.push(`        $in: [`)
+        lines.push(toObjectIdList(mapperConfigs))
         lines.push(`        ],`)
         lines.push(`    },`)
         lines.push(`})`)
@@ -178,7 +203,12 @@ function printSummary(resources: TrackedResource[]): void {
     console.log(`├${bar}┤`)
 
     // Group by type for a cleaner printout
-    for (const type of ['provider', 'integrator', 'api-config'] as const) {
+    for (const type of [
+        'provider',
+        'integrator',
+        'api-config',
+        'mapper-config',
+    ] as const) {
         const items = byType(resources, type)
         if (items.length === 0) continue
         const typeLabel = `  ── ${type} (${items.length}) ──`

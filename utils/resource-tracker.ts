@@ -11,11 +11,12 @@
  *   clearTracker()        → called at the end of global teardown
  *
  * MongoDB collection map (Standard.Proxy.Core entities):
- *   'provider'   → db collection: providers
- *   'integrator' → db collection: integrators
- *   'api-config' → db collection: apis
- *                  (ApiVersions + ProviderApiEndpoints are embedded subdocuments —
- *                   deleting the api-config document removes them automatically)
+ *   'provider'      → db collection: providers
+ *   'integrator'    → db collection: integrators
+ *   'api-config'    → db collection: apis
+ *                     (ApiVersions + ProviderApiEndpoints are embedded subdocuments —
+ *                      deleting the api-config document removes them automatically)
+ *   'mapper-config' → db collection: mapperConfigs
  */
 
 import * as fs from 'fs'
@@ -26,7 +27,11 @@ import * as path from 'path'
 // ---------------------------------------------------------------------------
 
 /** Logical resource category — maps to a MongoDB collection. */
-export type ResourceType = 'provider' | 'integrator' | 'api-config'
+export type ResourceType =
+    | 'provider'
+    | 'integrator'
+    | 'api-config'
+    | 'mapper-config'
 
 export interface TrackedResource {
     /** MongoDB _id as a 24-char hex string. */

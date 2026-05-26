@@ -1,5 +1,6 @@
 import { APIRequestContext } from '@playwright/test'
 import { config } from '@helpers/config'
+import { trackResource } from '@helpers/resource-tracker'
 import {
     MapperConfigItem,
     CreateMapperConfigPayload,
@@ -32,7 +33,8 @@ export const getMapperConfigs = async (
 /** POST /proxy-configs/v1/mappers */
 export const createMapperConfig = async (
     ctx: APIRequestContext,
-    payload: CreateMapperConfigPayload
+    payload: CreateMapperConfigPayload,
+    autoTrack?: string,
 ): Promise<{ id: string }> => {
     const res = await ctx.post(BASE, { data: payload })
     if (!res.ok()) {
@@ -40,7 +42,16 @@ export const createMapperConfig = async (
             `createMapperConfig failed (${res.status()}): ${await res.text()}`
         )
     }
-    return res.json() as Promise<{ id: string }>
+    const result = (await res.json()) as { id: string }
+    if (autoTrack) {
+        trackResource({
+            id: result.id,
+            type: 'mapper-config',
+            description: `integrator=${payload.integratorId} endpoint=${payload.providerApiEndpointId}`,
+            spec: autoTrack,
+        })
+    }
+    return result
 }
 
 /** PUT /proxy-configs/v1/mappers/{mapperConfigId} */
@@ -56,6 +67,14 @@ export const updateMapperConfig = async (
         )
     }
     return res.json() as Promise<MapperConfigItem>
+}
+
+/** DELETE /proxy-configs/v1/mappers/{mapperConfigId} */
+export const deleteMapperConfig = async (
+    ctx: APIRequestContext,
+    mapperConfigId: string
+): Promise<void> => {
+    await ctx.delete(`${BASE}/${mapperConfigId}`)
 }
 
 /** GET /proxy-configs/v1/mappers/{mapperConfigId}/snapshots — handles both flat-array and { items } shapes */
