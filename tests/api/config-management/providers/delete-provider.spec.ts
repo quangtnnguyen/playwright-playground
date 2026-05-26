@@ -1,6 +1,7 @@
 import { test, expect } from '@fixtures'
 import { assertStatus } from '@helpers/assertions.helper'
 import { config, hasToken } from '@helpers/config'
+import { getAuthHeaders } from '@helpers/auth.helper'
 import {
     createProvider,
     deleteProvider,
@@ -144,6 +145,7 @@ test.describe('DELETE /providers/{providerId}', () => {
     test.describe
         .serial('4. Block delete — provider has active endpoints', () => {
         let providerId!: string
+        let providerName!: string
         let providerProxyCode!: string
         let apiConfigId!: string
         let apiVersionId!: string
@@ -152,12 +154,13 @@ test.describe('DELETE /providers/{providerId}', () => {
         test.beforeAll(async ({ workerAuthedRequest }) => {
             test.skip(!hasToken(), 'OAuth credentials required')
             const suffix = uid()
+            providerName = `test-provider-${suffix}`
             providerProxyCode = `prov-${suffix}`
 
             const provider = await createProvider(
                 workerAuthedRequest,
                 {
-                    name: `test-provider-${suffix}`,
+                    name: providerName,
                     description: 'TC-4 test provider',
                     proxyCode: providerProxyCode,
                 },
@@ -242,7 +245,7 @@ test.describe('DELETE /providers/{providerId}', () => {
             expect(body.title).toBe('Provider.HasActiveEndpoints')
             expect(body.status).toBe(400)
             expect(body.detail).toBe(
-                `The provider with proxy code '${providerProxyCode}' has active API endpoints and cannot be deleted`
+                `Provider '${providerName}' is referenced by one or more ProviderApiEndpoints and cannot be deleted. Remove all associated endpoints first`
             )
             expect(body.type).toContain('rfc9110')
             expect(body.errors).toBeNull()
@@ -253,6 +256,7 @@ test.describe('DELETE /providers/{providerId}', () => {
     test.describe
         .serial('5. Block delete — provider referenced by integrator', () => {
         let providerId!: string
+        let providerName!: string
         let providerProxyCode!: string
         let integratorId!: string
         let integratorName!: string
@@ -261,6 +265,7 @@ test.describe('DELETE /providers/{providerId}', () => {
         test.beforeAll(async ({ workerAuthedRequest }) => {
             test.skip(!hasToken(), 'OAuth credentials required')
             const suffix = uid()
+            providerName = `test-provider-${suffix}`
             providerProxyCode = `prov-${suffix}`
             integratorName = `integrator-${suffix}`
             integratorAuth0Id = `auth0|test-${suffix}`
@@ -268,7 +273,7 @@ test.describe('DELETE /providers/{providerId}', () => {
             const provider = await createProvider(
                 workerAuthedRequest,
                 {
-                    name: `test-provider-${suffix}`,
+                    name: providerName,
                     description: 'TC-5 test provider',
                     proxyCode: providerProxyCode,
                 },
@@ -312,7 +317,7 @@ test.describe('DELETE /providers/{providerId}', () => {
             expect(body.title).toBe('Provider.ReferencedByIntegrator')
             expect(body.status).toBe(400)
             expect(body.detail).toBe(
-                `The provider with proxy code '${providerProxyCode}' is referenced by one or more integrators and cannot be deleted`
+                `Provider '${providerName}' is referenced by one or more Integrators and cannot be deleted. Remove the provider from all integrator access lists first`
             )
             expect(body.type).toContain('rfc9110')
             expect(body.errors).toBeNull()
@@ -634,15 +639,143 @@ test.describe('DELETE /providers/{providerId}', () => {
         })
     })
 
-    // ─── 8. Proxy routing rejection (pending environment) ────────────────────
-    test.describe('8. Proxy routing rejection', () => {
-        test.fixme('TC-8.1 — Proxy routing rejects X-Api-Provider header matching a soft-deleted provider proxyCode', async () => {
-            // Requires a live proxy routing environment.
-            // Steps (when runnable):
-            // 1. Create a provider, note its proxyCode.
-            // 2. Soft-delete the provider.
-            // 3. Send a proxied request with header X-Api-Provider: {proxyCode}.
-            // Expected: Request rejected; not forwarded to any endpoint.
+    // ─── 8. Proxy routing rejection ──────────────────────────────────────────
+    test.describe.serial('8. Proxy routing rejection', () => {
+        let deletedProxyCode!: string
+        let activeProviderId!: string
+        let apiConfigId!: string
+        let apiVersionId!: string
+        let endpointId!: string
+        let prefixPath!: string
+
+        test.beforeAll(async ({ workerAuthedRequest }) => {
+            test.skip(!hasToken(), 'OAuth credentials required')
+            const suffix = uid()
+            const activeProxyCode = `prov-act-${suffix}`
+            deletedProxyCode = `prov-del-${suffix}`
+            prefixPath = `/tc81-${suffix}`
+
+            // Active provider - referenced by the routable endpoint so the proxy has a real route.
+            const activeProvider = await createProvider(
+                workerAuthedRequest,
+                {
+                    name: `active-provider-${suffix}`,
+                    description: 'TC-8.1 active provider (route target)',
+                    proxyCode: activeProxyCode,
+                },
+                'delete-provider'
+            )
+            activeProviderId = activeProvider.id
+
+            // Secondary provider — soft-deleted; its proxyCode is what we send in the X-Api-Provider header.
+            const deletedProvider = await createProvider(
+                workerAuthedRequest,
+                {
+                    name: `deleted-provider-${suffix}`,
+                    description: 'TC-8.1 provider to soft-delete',
+                    proxyCode: deletedProxyCode,
+                },
+                'delete-provider'
+            )
+
+            const apiConfig = await createApiConfig(
+                workerAuthedRequest,
+                {
+                    name: `api-config-${suffix}`,
+                    description: 'TC-8.1 api config',
+                    isActive: true,
+                },
+                'delete-provider'
+            )
+            apiConfigId = apiConfig.id
+
+            const apiVersion = await createApiVersion(
+                workerAuthedRequest,
+                apiConfigId,
+                {
+                    prefixPath,
+                    httpMethod: 'GET',
+                    isActive: true,
+                    allowedScopes: ['test-scope'],
+                    schemaValidators: [],
+                }
+            )
+            apiVersionId = apiVersion.id
+
+            const endpoint = await createProviderEndpoint(
+                workerAuthedRequest,
+                apiConfigId,
+                apiVersionId,
+                {
+                    apiId: apiConfigId,
+                    apiVersionId: apiVersionId,
+                    name: `endpoint-${suffix}`,
+                    description: 'TC-8.1 endpoint (active provider target)',
+                    endpoint: 'https://example.com/test',
+                    providerProxyConfig: {
+                        proxyField: 'X-Api-Provider',
+                        container: 'Header',
+                        proxyCodeValues: [activeProxyCode],
+                        isCaseSensitive: false,
+                    },
+                    authRequest: {
+                        url: 'https://auth.example.com',
+                        httpMethod: 'POST',
+                        authType: 'Anonymous',
+                        fieldValues: [],
+                    },
+                    extensions: [],
+                }
+            )
+            endpointId = endpoint.id
+
+            // Soft-delete the secondary provider; routable endpoint references the active one only.
+            await deleteProvider(workerAuthedRequest, deletedProvider.id)
+        })
+
+        test.afterAll(async ({ workerAuthedRequest }) => {
+            if (endpointId) {
+                await deleteProviderEndpoint(
+                    workerAuthedRequest,
+                    apiConfigId,
+                    apiVersionId,
+                    endpointId
+                )
+            }
+            if (activeProviderId) {
+                await deleteProvider(workerAuthedRequest, activeProviderId)
+            }
+        })
+
+        test('TC-8.1 — Proxy routing rejects X-Api-Provider header matching a soft-deleted provider proxyCode', async ({
+            playwright,
+        }) => {
+            const proxyCtx = await playwright.request.newContext({
+                baseURL: config.proxyBaseUrl,
+                extraHTTPHeaders: {
+                    Accept: 'application/json',
+                    ...(await getAuthHeaders()),
+                },
+            })
+
+            try {
+                const response = await proxyCtx.get(prefixPath, {
+                    headers: { 'X-Api-Provider': deletedProxyCode },
+                })
+                const body = (await response.json()) as ApiErrorBody
+                expect(body.status).toBe(404)
+                expect(body.type).toContain('rfc9110')
+                expect(body.title).toBe('Resource Not Found')
+                expect(body.detail).toBe('Resource Not Found')
+                expect(body.errors).not.toBeNull()
+                expect(body.errors).toHaveLength(1)
+                expect(body.errors[0].errorCode).toBe('404')
+                expect(body.errors[0].errorDescription).toBe(
+                    'The requested resource could not be found'
+                )
+            } finally {
+                await proxyCtx.dispose()
+            }
         })
     })
 })

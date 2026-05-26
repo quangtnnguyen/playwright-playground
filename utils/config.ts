@@ -7,19 +7,16 @@ dotenv.config()
  * Set values in .env (copy from .env.example).
  */
 export const config = {
-    /** Base URL of the fis-common-standard-proxy API */
+    /** Base URL of the fis-common-standard-proxy API (config management) */
     baseUrl: process.env['BASE_URL'] ?? 'http://localhost:5000',
+
+    /** Base URL of the proxy server (runtime request routing) */
+    proxyBaseUrl:
+        process.env['PROXY_BASE_URL'] ?? 'http://localhost:5001',
 
     /** Route prefix for the config management API (e.g. proxy-configs/v1) */
     configApiBasePath:
         process.env['CONFIG_API_BASE_PATH'] ?? 'proxy-configs/v1',
-
-    /** Path segment for the proxy search route (e.g. v1/search) */
-    proxySearchPath: process.env['PROXY_SEARCH_PATH'] ?? 'v1/search',
-
-    /** Path segment for the proxy cancel-quotes route (e.g. v1/cancel/quotes) */
-    proxyCancelQuotesPath:
-        process.env['PROXY_CANCEL_QUOTES_PATH'] ?? 'v1/cancel/quotes',
 
     /** OAuth authorization URL */
     authUrl: process.env['AUTH_URL'] ?? '',

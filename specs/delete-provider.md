@@ -221,16 +221,22 @@ Serial suite: create a provider, soft-delete it, then verify downstream create o
 
 ---
 
-## 8. Proxy routing rejection (pending environment)
+## 8. Proxy routing rejection
+
+Serial suite: build a routable endpoint chain for an active provider, then send a proxied request with the `X-Api-Provider` header set to a soft-deleted provider's `proxyCode`. Proxy server URL comes from `PROXY_BASE_URL` (`config.proxyBaseUrl`).
 
 ### TC-8.1 — Proxy routing rejects `X-Api-Provider` header matching soft-deleted provider `proxyCode`
 
-**Note:** Requires a live proxy routing environment. Marked `test.fixme` until the routing layer is available in the test environment.
+**Precondition:**
 
-**Steps (when runnable):**
+- Active provider A created (route target).
+- ApiConfig + ApiVersion (`prefixPath`, `httpMethod: GET`) + ProviderApiEndpoint created with `providerProxyConfig.proxyCodeValues: [A.proxyCode]`.
+- Provider B created then soft-deleted; `B.proxyCode` is the header value under test.
 
-1. Create a provider, note its `proxyCode`.
-2. Soft-delete the provider.
-3. Send a proxied request with header `X-Api-Provider: {proxyCode}`.
+**Steps:**
 
-**Expected:** Request rejected; not forwarded to any endpoint.
+1. Send `GET {PROXY_BASE_URL}{prefixPath}` with header `X-Api-Provider: {B.proxyCode}`.
+
+**Expected:** HTTP 4xx (request rejected; not forwarded to any endpoint).
+
+**Cleanup:** Delete provider endpoint, delete provider A. (Provider B already soft-deleted.)

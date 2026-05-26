@@ -13,10 +13,9 @@ Required `.env` variables — all four OAuth vars must be set for authenticated 
 
 | Variable             | Default / Purpose                                 |
 | -------------------- | ------------------------------------------------- |
-| `BASE_URL`           | `http://localhost:5000` — API root                |
+| `BASE_URL`           | `http://localhost:5000` — config management API root |
+| `PROXY_BASE_URL`     | `http://localhost:5001` — proxy server (runtime routing) |
 | `CONFIG_API_BASE_PATH` | `proxy-configs/v1` — config management prefix  |
-| `PROXY_SEARCH_PATH`  | `v1/search` — proxy search route                 |
-| `PROXY_CANCEL_QUOTES_PATH` | `v1/cancel/quotes` — proxy cancel-quotes    |
 | `AUTH_URL`           | OAuth token endpoint (no default, required)       |
 | `AUTH_CLIENT_ID`     | M2M client ID                                     |
 | `AUTH_CLIENT_SECRET` | M2M client secret                                 |
