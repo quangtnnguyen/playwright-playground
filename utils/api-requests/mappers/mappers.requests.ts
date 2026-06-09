@@ -113,6 +113,15 @@ export const createMapperSnapshot = async (
     return res.json() as Promise<{ id: string; version: number }>
 }
 
+/** DELETE /proxy-configs/v1/mappers/{mapperConfigId}/snapshots/{snapshotId} */
+export const deleteMapperSnapshot = async (
+    ctx: APIRequestContext,
+    mapperConfigId: string,
+    snapshotId: string
+): Promise<void> => {
+    await ctx.delete(`${BASE}/${mapperConfigId}/snapshots/${snapshotId}`)
+}
+
 /** GET /proxy-configs/v1/mappers/{endpointId}/{integratorId} — response shape unknown until tested */
 export const getProxyMapperConfig = async (
     ctx: APIRequestContext,

@@ -3,49 +3,6 @@
 **Endpoint:** `DELETE /api-configs/{apiId}/versions/{apiVersionId}/provider-endpoints/{providerApiEndpointId}`
 **Method:** DELETE
 **Scope required:** `write:configs`
-**Spec file:** `tests/api/config-management/api-configs/delete-provider-api-endpoint.spec.ts`
-
----
-
-## Overview
-
-As an FIS admin I want to delete a provider API endpoint so I can remove stale or incorrect endpoint configurations
-without database access. The operation is a **soft delete** — the record is flagged as deleted with a timestamp and
-retained in the database, but every read / write path must treat it as non-existent.
-
-## Setup fixtures (per serial suite that needs a real endpoint)
-
-1. **Provider** — `createProvider(...)` with a unique `proxyCode`. Needed so a `ProviderApiEndpoint` can reference it
-   via `providerProxyConfig.proxyCodeValues`.
-2. **ApiConfig** — `createApiConfig(...)`. Captures `apiId`.
-3. **ApiVersion** — `createApiVersion(apiId, ...)` with `prefixPath`, `httpMethod`, `isActive`, `allowedScopes`,
-   `schemaValidators: []`. Captures `apiVersionId`.
-4. **ProviderApiEndpoint** — `createProviderEndpoint(apiId, apiVersionId, ...)` with `providerProxyConfig` pointing at
-   the provider's `proxyCode`, and a minimal `authRequest` (`authType: 'Anonymous'`). Captures `providerApiEndpointId`.
-5. **MapperConfig (TC-5 only)** — created via direct POST to the mapper-config endpoint with `endpointId =
-   providerApiEndpointId`. Used to verify the `ProviderApiEndpoint.ReferencedByMapperConfig` 400.
-
-All resources are created via the typed `@helpers/api-requests` builders with `autoTrack = 'delete-provider-api-endpoint'`
-so global teardown writes a mongosh cleanup script.
-
-## Teardown notes
-
-- Resources created through `createProvider` / `createIntegrator` / `createApiConfig` are auto-tracked via the
-  resource-tracker NDJSON; `global-teardown.ts` emits `db-cleanup-scripts/mm-dd-yyyy-delete-provider-api-endpoint.{js,json}`.
-- `ProviderApiEndpoint` is an embedded subdocument inside the `apis` collection, so deleting the api-config row removes
-  it automatically — no separate tracking required.
-- `MapperConfig` (TC-5) is **not** covered by the auto-tracker; the suite must delete it explicitly in `afterAll` before
-  letting the api-config cleanup run. If the mapper-config delete API is itself unavailable, `trackResource` it with
-  type `'mapper-config'` and add manual cleanup in the mongosh script (note this as a known limitation in the suite).
-- `afterAll` should `await` cleanup before returning so the worker context is not disposed mid-request.
-
-## Constants
-
-| Constant         | Value                                                                            |
-| ---------------- | -------------------------------------------------------------------------------- |
-| `SPEC_TAG`       | `'delete-provider-api-endpoint'`                                                 |
-| `NONEXISTENT_ID` | `'68f064df1ba266b972ee56a0'` (well-formed ObjectId, no matching document)        |
-| `ENDPOINTS_PATH` | `` `/${config.configApiBasePath}/api-configs/${apiId}/versions/${apiVersionId}/provider-endpoints` `` |
 
 ---
 

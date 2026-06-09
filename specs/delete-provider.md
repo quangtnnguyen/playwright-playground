@@ -3,7 +3,6 @@
 **Endpoint:** `DELETE /providers/{providerId}`  
 **Method:** DELETE  
 **Scope required:** `write:configs`  
-**Spec file:** `tests/api/config-management/providers/delete-provider.spec.ts`
 
 ---
 
@@ -100,7 +99,7 @@ Serial suite: create one fresh provider, delete it, then verify each side effect
 
 Serial suite: create provider → api config → api version → provider endpoint referencing the provider's `proxyCode` → attempt delete.
 
-### TC-4.1 — Returns 400 `provider_has_active_endpoints` with correct error shape
+### TC-4.1 — Returns 400 `Provider.HasActiveEndpoints` with correct error shape
 
 **Precondition:**
 
@@ -114,10 +113,11 @@ Serial suite: create provider → api config → api version → provider endpoi
 **Expected:**
 
 - HTTP 400.
-- `body.title` = `"provider_has_active_endpoints"`.
+- `body.title` = `"Provider.HasActiveEndpoints"`.
 - `body.status` = `400`.
 - `body.type` contains `"rfc9110"`.
-- `body.errors` array contains an object with `errorCode: "provider_has_active_endpoints"`.
+- `body.detail` = `"Provider '{providerName}' is referenced by one or more ProviderApiEndpoints and cannot be deleted. Remove all associated endpoints first"`.
+- `body.errors` is `null` (domain-level error, not a validation errors array).
 
 **Cleanup:** Delete provider endpoint, then delete provider.
 
@@ -127,7 +127,7 @@ Serial suite: create provider → api config → api version → provider endpoi
 
 Serial suite: create provider → integrator referencing `proxyCode` → attempt delete.
 
-### TC-5.1 — Returns 400 `provider_referenced_by_integrator` with correct error shape
+### TC-5.1 — Returns 400 `Provider.ReferencedByIntegrator` with correct error shape
 
 **Precondition:**
 
@@ -141,10 +141,11 @@ Serial suite: create provider → integrator referencing `proxyCode` → attempt
 **Expected:**
 
 - HTTP 400.
-- `body.title` = `"provider_referenced_by_integrator"`.
+- `body.title` = `"Provider.ReferencedByIntegrator"`.
 - `body.status` = `400`.
 - `body.type` contains `"rfc9110"`.
-- `body.errors` array contains an object with `errorCode: "provider_referenced_by_integrator"`.
+- `body.detail` = `"Provider '{providerName}' is referenced by one or more Integrators and cannot be deleted. Remove the provider from all integrator access lists first"`.
+- `body.errors` is `null` (domain-level error, not a validation errors array).
 
 **Cleanup:** Delete integrator, then delete provider.
 
@@ -237,6 +238,15 @@ Serial suite: build a routable endpoint chain for an active provider, then send 
 
 1. Send `GET {PROXY_BASE_URL}{prefixPath}` with header `X-Api-Provider: {B.proxyCode}`.
 
-**Expected:** HTTP 4xx (request rejected; not forwarded to any endpoint).
+**Expected:**
+
+- HTTP 404.
+- `body.status` = `404`.
+- `body.type` contains `"rfc9110"`.
+- `body.title` = `"Resource Not Found"`.
+- `body.detail` = `"Resource Not Found"`.
+- `body.errors` is not `null` and has length 1.
+- `body.errors[0].errorCode` = `"404"`.
+- `body.errors[0].errorDescription` = `"The requested resource could not be found"`.
 
 **Cleanup:** Delete provider endpoint, delete provider A. (Provider B already soft-deleted.)
