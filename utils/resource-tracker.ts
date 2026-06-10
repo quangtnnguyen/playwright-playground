@@ -17,6 +17,7 @@
  *                     (ApiVersions + ProviderApiEndpoints are embedded subdocuments —
  *                      deleting the api-config document removes them automatically)
  *   'mapper-config' → db collection: mapperConfigs
+ *   'transformer'   → db collection: transformers   (fis-common-transformer MongoDB)
  */
 
 import * as fs from 'fs'
@@ -32,6 +33,7 @@ export type ResourceType =
     | 'integrator'
     | 'api-config'
     | 'mapper-config'
+    | 'transformer'
 
 export interface TrackedResource {
     /** MongoDB _id as a 24-char hex string. */

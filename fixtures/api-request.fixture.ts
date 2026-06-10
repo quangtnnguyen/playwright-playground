@@ -11,11 +11,17 @@ type ApiFixtures = {
     apiRequest: APIRequestContext
     /** Authenticated APIRequestContext — includes Authorization header */
     authedRequest: APIRequestContext
+    /** Unauthenticated context targeting the Transformer service */
+    transformerApiRequest: APIRequestContext
+    /** Authenticated context targeting the Transformer service */
+    authedTransformerRequest: APIRequestContext
 }
 
 type WorkerFixtures = {
     /** Single authenticated context shared across the whole worker (spec file). */
     workerAuthedRequest: APIRequestContext
+    /** Worker-scoped authenticated context for the Transformer service */
+    workerAuthedTransformerRequest: APIRequestContext
 }
 
 /**
@@ -64,6 +70,57 @@ export const test = base.extend<ApiFixtures, WorkerFixtures>({
             }
             const ctx = await playwright.request.newContext({
                 baseURL: config.baseUrl,
+                extraHTTPHeaders: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                    ...(await getAuthHeaders()),
+                },
+            })
+            await use(ctx)
+            await ctx.dispose()
+        },
+        { scope: 'worker' },
+    ],
+
+    // Transformer service contexts — baseURL points to TRANSFORMER_BASE_URL
+
+    transformerApiRequest: async ({ playwright }, use) => {
+        const context = await playwright.request.newContext({
+            baseURL: config.transformerBaseUrl,
+            extraHTTPHeaders: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+            },
+        })
+        await use(context)
+        await context.dispose()
+    },
+
+    authedTransformerRequest: async ({ playwright }, use) => {
+        const context = await playwright.request.newContext({
+            baseURL: config.transformerBaseUrl,
+            extraHTTPHeaders: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+                ...(await getAuthHeaders()),
+            },
+        })
+        await use(context)
+        await context.dispose()
+    },
+
+    workerAuthedTransformerRequest: [
+        async ({ playwright }, use) => {
+            if (!hasToken()) {
+                // Credentials absent — provide a bare context.
+                // Tests using this fixture must guard with test.skip(!hasToken(), …).
+                const ctx = await playwright.request.newContext({ baseURL: config.transformerBaseUrl })
+                await use(ctx)
+                await ctx.dispose()
+                return
+            }
+            const ctx = await playwright.request.newContext({
+                baseURL: config.transformerBaseUrl,
                 extraHTTPHeaders: {
                     Accept: 'application/json',
                     'Content-Type': 'application/json',

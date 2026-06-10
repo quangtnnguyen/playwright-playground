@@ -67,6 +67,7 @@ function generateScript(
     const integrators = byType(resources, 'integrator')
     const apiConfigs = byType(resources, 'api-config')
     const mapperConfigs = byType(resources, 'mapper-config')
+    const transformers = byType(resources, 'transformer')
 
     const lines: string[] = [
         `// MongoDB cleanup script`,
@@ -118,6 +119,13 @@ function generateScript(
     lines.push(`//`)
     lines.push(`//  Mapper Configs (${mapperConfigs.length})`)
     for (const r of mapperConfigs) {
+        lines.push(`//    id=${r.id}  "${r.description}"`)
+        lines.push(`//    created=${r.createdAt}`)
+    }
+
+    lines.push(`//`)
+    lines.push(`//  Transformers (${transformers.length})`)
+    for (const r of transformers) {
         lines.push(`//    id=${r.id}  "${r.description}"`)
         lines.push(`//    created=${r.createdAt}`)
     }
@@ -186,6 +194,18 @@ function generateScript(
         lines.push(`})`)
     }
 
+    if (transformers.length > 0) {
+        lines.push(``)
+        lines.push(`// Transformers (fis-common-transformer collection)`)
+        lines.push(`db.getCollection(COLLECTION_PREFIX + 'transformers').deleteMany({`)
+        lines.push(`    _id: {`)
+        lines.push(`        $in: [`)
+        lines.push(toObjectIdList(transformers))
+        lines.push(`        ],`)
+        lines.push(`    },`)
+        lines.push(`})`)
+    }
+
     return lines.join('\n') + '\n'
 }
 
@@ -208,6 +228,7 @@ function printSummary(resources: TrackedResource[]): void {
         'integrator',
         'api-config',
         'mapper-config',
+        'transformer',
     ] as const) {
         const items = byType(resources, type)
         if (items.length === 0) continue

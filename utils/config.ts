@@ -30,6 +30,10 @@ export const config = {
     /** OAuth audience */
     authAudience: process.env['AUTH_AUDIENCE'] ?? '',
 
+    /** Base URL of the fis-common-transformer API */
+    transformerBaseUrl:
+        process.env['TRANSFORMER_BASE_URL'] ?? '',
+
     /** True when running in CI environment */
     isCI: Boolean(process.env['CI']),
 } as const
