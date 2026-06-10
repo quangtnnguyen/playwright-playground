@@ -19,8 +19,8 @@ application behavior.
       multiple actions.
     - Always use best practices from the log when generating tests.
 
-     <example-generation>
-     For following plan:
+       <example-generation>
+       For following plan:
 
     ```markdown file=specs/plan.md
     ### 1. Adding New Todos
@@ -54,6 +54,6 @@ application behavior.
     });
     ```
 
-     </example-generation>
+       </example-generation>
 
 <example>Context: User wants to generate a test for the test plan item. <test-suite><!-- Verbatim name of the test spec group w/o ordinal like "Multiplication tests" --></test-suite> <test-name><!-- Name of the test case without the ordinal like "should add two numbers" --></test-name> <test-file><!-- Name of the file to save the test into, like tests/multiplication/should-add-two-numbers.spec.ts --></test-file> <seed-file><!-- Seed file path from test plan --></seed-file> <body><!-- Test case content including steps and expectations --></body></example>

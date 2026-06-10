@@ -31,7 +31,7 @@ export const getProviders = async (
 export const createProvider = async (
     ctx: APIRequestContext,
     payload: CreateProviderPayload,
-    autoTrack?: string,
+    autoTrack?: string
 ): Promise<{ id: string }> => {
     const res = await ctx.post(BASE, { data: payload })
     if (!res.ok()) {
@@ -41,7 +41,12 @@ export const createProvider = async (
     }
     const result = (await res.json()) as { id: string }
     if (autoTrack) {
-        trackResource({ id: result.id, type: 'provider', description: payload.name, spec: autoTrack })
+        trackResource({
+            id: result.id,
+            type: 'provider',
+            description: payload.name,
+            spec: autoTrack,
+        })
     }
     return result
 }

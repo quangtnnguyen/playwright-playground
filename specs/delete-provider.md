@@ -2,7 +2,7 @@
 
 **Endpoint:** `DELETE /providers/{providerId}`  
 **Method:** DELETE  
-**Scope required:** `write:configs`  
+**Scope required:** `write:configs`
 
 ---
 

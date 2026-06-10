@@ -47,10 +47,10 @@ All resources are created via the typed `@helpers/api-requests` builders with
 
 ## Constants
 
-| Constant         | Value                                                                                            |
-| ---------------- | ------------------------------------------------------------------------------------------------ |
-| `SPEC_TAG`       | `'delete-mapper-config-snapshot'`                                                                |
-| `NONEXISTENT_ID` | `'68f064df1ba266b972ee56a0'` (well-formed ObjectId, no matching document)                        |
+| Constant         | Value                                                                                                |
+| ---------------- | ---------------------------------------------------------------------------------------------------- |
+| `SPEC_TAG`       | `'delete-mapper-config-snapshot'`                                                                    |
+| `NONEXISTENT_ID` | `'68f064df1ba266b972ee56a0'` (well-formed ObjectId, no matching document)                            |
 | `snapshotsPath`  | `` (mapperConfigId: string) => `/${config.configApiBasePath}/mappers/${mapperConfigId}/snapshots` `` |
 
 ---
@@ -129,11 +129,11 @@ one endpoint, **two** integrators, two mapper configs, one snapshot per mapper c
 
 - HTTP 400.
 - Parsed body conforms to `ApiErrorBody`:
-  - `body.title === 'General.Validation'`
-  - `body.status === 400`
-  - `body.type` contains `'rfc9110'`
-  - `body.detail` is truthy
-  - `body.errors` is not `null`
+    - `body.title === 'General.Validation'`
+    - `body.status === 400`
+    - `body.type` contains `'rfc9110'`
+    - `body.detail` is truthy
+    - `body.errors` is not `null`
 
 ---
 
@@ -147,11 +147,11 @@ one endpoint, **two** integrators, two mapper configs, one snapshot per mapper c
 
 - HTTP 400.
 - Parsed body conforms to `ApiErrorBody`:
-  - `body.title === 'General.Validation'`
-  - `body.status === 400`
-  - `body.type` contains `'rfc9110'`
-  - `body.detail` is truthy
-  - `body.errors` is not `null`
+    - `body.title === 'General.Validation'`
+    - `body.status === 400`
+    - `body.type` contains `'rfc9110'`
+    - `body.detail` is truthy
+    - `body.errors` is not `null`
 
 ---
 
@@ -246,19 +246,19 @@ via `updateMapperConfig`.
 
 - HTTP 400.
 - Parsed body conforms to `ApiErrorBody`:
-  - `body.title` matches `/MapperConfigSnapshot/` (e.g. `'MapperConfigSnapshot.IsActiveSnapshot'`)
-  - `body.status === 400`
-  - `body.type` contains `'rfc9110'`
-  - `body.detail` is truthy (server-supplied human-readable message)
-  - `body.errors` is `null` (domain-level error, not a validation errors array)
+    - `body.title` matches `/MapperConfigSnapshot/` (e.g. `'MapperConfigSnapshot.IsActiveSnapshot'`)
+    - `body.status === 400`
+    - `body.type` contains `'rfc9110'`
+    - `body.detail` is truthy (server-supplied human-readable message)
+    - `body.errors` is `null` (domain-level error, not a validation errors array)
 
 ---
 
 ## Suites covered
 
-| Suite | Description                                                                   | Auth required | Notes                                                    |
-| ----- | ----------------------------------------------------------------------------- | ------------- | -------------------------------------------------------- |
-| 1     | Unauthenticated — 401 / invalid token / missing scope                         | No            | TC-1.3 skipped (scope non-testable with default client)  |
-| 2     | Authenticated — ID resolution errors (missing IDs, malformed IDs, wrong owner) | Yes          | `test.describe.serial`; two integrators needed for TC-2.5 |
-| 3     | Successful soft delete + GET exclusion + re-delete 404 + PUT rejection        | Yes           | `test.describe.serial`; TC-3.4 allows 400 or 404         |
-| 4     | Block delete — active snapshot cannot be deleted                              | Yes           | `test.describe.serial`; TC-4.1 uses regex on `body.title` |
+| Suite | Description                                                                    | Auth required | Notes                                                     |
+| ----- | ------------------------------------------------------------------------------ | ------------- | --------------------------------------------------------- |
+| 1     | Unauthenticated — 401 / invalid token / missing scope                          | No            | TC-1.3 skipped (scope non-testable with default client)   |
+| 2     | Authenticated — ID resolution errors (missing IDs, malformed IDs, wrong owner) | Yes           | `test.describe.serial`; two integrators needed for TC-2.5 |
+| 3     | Successful soft delete + GET exclusion + re-delete 404 + PUT rejection         | Yes           | `test.describe.serial`; TC-3.4 allows 400 or 404          |
+| 4     | Block delete — active snapshot cannot be deleted                               | Yes           | `test.describe.serial`; TC-4.1 uses regex on `body.title` |

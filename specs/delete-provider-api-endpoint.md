@@ -91,11 +91,11 @@ suite from TC-3).
 
 - HTTP 400.
 - Parsed body conforms to `ApiErrorBody`:
-  - `body.status === 400`
-  - `body.type` contains `'rfc9110'`
-  - `body.title === 'General.Validation'`
-  - `body.detail === 'One or more validation errors occurred'`
-  - `body.errors` is not null
+    - `body.status === 400`
+    - `body.type` contains `'rfc9110'`
+    - `body.title === 'General.Validation'`
+    - `body.detail === 'One or more validation errors occurred'`
+    - `body.errors` is not null
 
 ---
 
@@ -228,13 +228,13 @@ request context) and asserts the proxy refuses to forward.
 
 - HTTP 404 (request not forwarded upstream).
 - Parsed body conforms to `ApiErrorBody`:
-  - `body.status === 404`
-  - `body.type` contains `'rfc9110'`
-  - `body.title === 'Resource Not Found'`
-  - `body.detail === 'Resource Not Found'`
-  - `body.errors` is not null and has length 1
-  - `body.errors[0].errorCode === '404'`
-  - `body.errors[0].errorDescription === 'The requested resource could not be found'`
+    - `body.status === 404`
+    - `body.type` contains `'rfc9110'`
+    - `body.title === 'Resource Not Found'`
+    - `body.detail === 'Resource Not Found'`
+    - `body.errors` is not null and has length 1
+    - `body.errors[0].errorCode === '404'`
+    - `body.errors[0].errorDescription === 'The requested resource could not be found'`
 
 ---
 
@@ -258,11 +258,11 @@ endpoint → attempt delete.
 
 - HTTP 400.
 - Parsed body conforms to `ApiErrorBody`:
-  - `body.title === 'ProviderApiEndpoint.ReferencedByMapperConfig'`
-  - `body.status === 400`
-  - `body.type` contains `'rfc9110'`
-  - `body.detail` is truthy (server-supplied human-readable message)
-  - `body.errors` is `null` (this is a domain-level error, not a validation errors array)
+    - `body.title === 'ProviderApiEndpoint.ReferencedByMapperConfig'`
+    - `body.status === 400`
+    - `body.type` contains `'rfc9110'`
+    - `body.detail` is truthy (server-supplied human-readable message)
+    - `body.errors` is `null` (this is a domain-level error, not a validation errors array)
 
 **Cleanup:** Delete the mapper-config first, then the endpoint, then the api-config and provider. If mapper-config
 DELETE is unavailable, fall back to a manual mongosh cleanup entry.
@@ -307,11 +307,11 @@ malformed URL). Single representative case is sufficient — same expectation as
 
 ## Suites covered
 
-| Suite | Description                                                              | Auth required | Notes                                          |
-| ----- | ------------------------------------------------------------------------ | ------------- | ---------------------------------------------- |
-| 1     | Unauthenticated — 401 / invalid token / missing scope                    | No            | TC-1.3 may be skipped if scope is non-testable |
-| 2     | Authenticated — ID resolution errors (all three params, malformed forms) | Yes           | 404 preferred for malformed IDs                |
-| 3     | Successful soft delete + GET exclusion + PUT 404 + re-delete 404 + mapper-config CREATE rejection | Yes | `test.describe.serial`; TC-3.5 `test.fixme` (API bug — see case) |
-| 4     | Runtime forwarding rejection via `config.proxyBaseUrl`                   | Yes           | `test.describe.serial`                         |
-| 5     | Block delete — MapperConfig reference (400 + recovery)                   | Yes           | `test.describe.serial`; TC-5.2 `test.fixme` (flow bug — see case) |
-| 6     | Edge cases (cross-version path, concurrency note, whitespace)            | Yes           | TC-6.2 documented only                         |
+| Suite | Description                                                                                       | Auth required | Notes                                                             |
+| ----- | ------------------------------------------------------------------------------------------------- | ------------- | ----------------------------------------------------------------- |
+| 1     | Unauthenticated — 401 / invalid token / missing scope                                             | No            | TC-1.3 may be skipped if scope is non-testable                    |
+| 2     | Authenticated — ID resolution errors (all three params, malformed forms)                          | Yes           | 404 preferred for malformed IDs                                   |
+| 3     | Successful soft delete + GET exclusion + PUT 404 + re-delete 404 + mapper-config CREATE rejection | Yes           | `test.describe.serial`; TC-3.5 `test.fixme` (API bug — see case)  |
+| 4     | Runtime forwarding rejection via `config.proxyBaseUrl`                                            | Yes           | `test.describe.serial`                                            |
+| 5     | Block delete — MapperConfig reference (400 + recovery)                                            | Yes           | `test.describe.serial`; TC-5.2 `test.fixme` (flow bug — see case) |
+| 6     | Edge cases (cross-version path, concurrency note, whitespace)                                     | Yes           | TC-6.2 documented only                                            |

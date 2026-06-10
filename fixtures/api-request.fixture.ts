@@ -63,7 +63,9 @@ export const test = base.extend<ApiFixtures, WorkerFixtures>({
             if (!hasToken()) {
                 // Credentials absent — provide a bare context.
                 // Tests using this fixture must guard with test.skip(!hasToken(), …).
-                const ctx = await playwright.request.newContext({ baseURL: config.baseUrl })
+                const ctx = await playwright.request.newContext({
+                    baseURL: config.baseUrl,
+                })
                 await use(ctx)
                 await ctx.dispose()
                 return
@@ -114,7 +116,9 @@ export const test = base.extend<ApiFixtures, WorkerFixtures>({
             if (!hasToken()) {
                 // Credentials absent — provide a bare context.
                 // Tests using this fixture must guard with test.skip(!hasToken(), …).
-                const ctx = await playwright.request.newContext({ baseURL: config.transformerBaseUrl })
+                const ctx = await playwright.request.newContext({
+                    baseURL: config.transformerBaseUrl,
+                })
                 await use(ctx)
                 await ctx.dispose()
                 return

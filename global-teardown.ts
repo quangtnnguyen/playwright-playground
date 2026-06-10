@@ -197,7 +197,9 @@ function generateScript(
     if (transformers.length > 0) {
         lines.push(``)
         lines.push(`// Transformers (fis-common-transformer collection)`)
-        lines.push(`db.getCollection(COLLECTION_PREFIX + 'transformers').deleteMany({`)
+        lines.push(
+            `db.getCollection(COLLECTION_PREFIX + 'transformers').deleteMany({`
+        )
         lines.push(`    _id: {`)
         lines.push(`        $in: [`)
         lines.push(toObjectIdList(transformers))

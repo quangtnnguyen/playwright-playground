@@ -50,10 +50,9 @@ export const updateApiVersion = async (
     apiVersionId: string,
     payload: UpdateApiVersionPayload
 ): Promise<ApiVersionItem> => {
-    const res = await ctx.put(
-        `${versionsBase(apiId)}/${apiVersionId}`,
-        { data: payload }
-    )
+    const res = await ctx.put(`${versionsBase(apiId)}/${apiVersionId}`, {
+        data: payload,
+    })
     if (!res.ok()) {
         throw new Error(
             `updateApiVersion failed (${res.status()}): ${await res.text()}`

@@ -42,11 +42,11 @@ All resources are created via the typed `@helpers/api-requests` builders with
 
 ## Constants
 
-| Constant         | Value                                                     |
-| ---------------- | --------------------------------------------------------- |
-| `SPEC_TAG`       | `'delete-mapper-config'`                                  |
+| Constant         | Value                                                                     |
+| ---------------- | ------------------------------------------------------------------------- |
+| `SPEC_TAG`       | `'delete-mapper-config'`                                                  |
 | `NONEXISTENT_ID` | `'68f064df1ba266b972ee56a0'` (well-formed ObjectId, no matching document) |
-| `mappersPath`    | `` `/${config.configApiBasePath}/mappers` ``              |
+| `mappersPath`    | `` `/${config.configApiBasePath}/mappers` ``                              |
 
 ---
 
@@ -109,11 +109,11 @@ No real resources are created in this suite — `NONEXISTENT_ID` is sufficient f
 
 - HTTP 400.
 - Parsed body conforms to `ApiErrorBody`:
-  - `body.title === 'General.Validation'`
-  - `body.status === 400`
-  - `body.type` contains `'rfc9110'`
-  - `body.detail` is truthy
-  - `body.errors` is not `null`
+    - `body.title === 'General.Validation'`
+    - `body.status === 400`
+    - `body.type` contains `'rfc9110'`
+    - `body.detail` is truthy
+    - `body.errors` is not `null`
 
 ---
 
@@ -237,9 +237,9 @@ specific `(integratorId, apiVersionId, providerApiEndpointId)` combination, then
 
 ## Suites covered
 
-| Suite | Description                                                                              | Auth required | Notes                                                          |
-| ----- | ---------------------------------------------------------------------------------------- | ------------- | -------------------------------------------------------------- |
-| 1     | Unauthenticated — 401 / invalid token / missing scope                                    | No            | TC-1.3 skipped (scope non-testable with default client)        |
-| 2     | Authenticated — ID resolution errors (non-existent, malformed)                           | Yes           | `test.describe.serial`; no real resources needed               |
-| 3     | Successful soft delete + GET exclusion + PUT 404 + re-delete 404 + cascade + runtime enum | Yes          | `test.describe.serial`; TC-3.5 accepts 200 (empty) or 404     |
-| 4     | Uniqueness bypass — same combination create succeeds after soft-delete                   | Yes           | `test.describe.serial`; negative case deferred to create spec  |
+| Suite | Description                                                                               | Auth required | Notes                                                         |
+| ----- | ----------------------------------------------------------------------------------------- | ------------- | ------------------------------------------------------------- |
+| 1     | Unauthenticated — 401 / invalid token / missing scope                                     | No            | TC-1.3 skipped (scope non-testable with default client)       |
+| 2     | Authenticated — ID resolution errors (non-existent, malformed)                            | Yes           | `test.describe.serial`; no real resources needed              |
+| 3     | Successful soft delete + GET exclusion + PUT 404 + re-delete 404 + cascade + runtime enum | Yes           | `test.describe.serial`; TC-3.5 accepts 200 (empty) or 404     |
+| 4     | Uniqueness bypass — same combination create succeeds after soft-delete                    | Yes           | `test.describe.serial`; negative case deferred to create spec |

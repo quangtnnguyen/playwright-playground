@@ -6,13 +6,13 @@
             "command": ["npx", "playwright", "run-test-mcp-server"],
             "enabled": true
         },
-		"agentmemory": {
-			"type": "local",
-			"command": ["npx", "-y", "@agentmemory/mcp"],
-			"enabled": true
-		},
+        "agentmemory": {
+            "type": "local",
+            "command": ["npx", "-y", "@agentmemory/mcp"],
+            "enabled": true
+        }
     },
-	"plugin": ["./plugins/agentmemory-capture.ts"],
+    "plugin": ["./plugins/agentmemory-capture.ts"],
     "tools": {
         "playwright*": false
     },

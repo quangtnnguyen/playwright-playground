@@ -29,7 +29,7 @@ export const getApiConfigs = async (
 export const createApiConfig = async (
     ctx: APIRequestContext,
     payload: CreateApiConfigPayload,
-    autoTrack?: string,
+    autoTrack?: string
 ): Promise<{ id: string }> => {
     const res = await ctx.post(BASE, { data: payload })
     if (!res.ok()) {
@@ -39,7 +39,12 @@ export const createApiConfig = async (
     }
     const result = (await res.json()) as { id: string }
     if (autoTrack) {
-        trackResource({ id: result.id, type: 'api-config', description: payload.name, spec: autoTrack })
+        trackResource({
+            id: result.id,
+            type: 'api-config',
+            description: payload.name,
+            spec: autoTrack,
+        })
     }
     return result
 }

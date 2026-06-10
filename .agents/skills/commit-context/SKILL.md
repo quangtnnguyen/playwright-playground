@@ -1,7 +1,7 @@
 ---
 name: commit-context
 description: Trace a file, function, or line back to the agent session that produced its current commit. Use when the user asks "why is this code here", "what was the agent doing when this changed", or wants context on a specific location in the codebase.
-argument-hint: "[file, function, or line]"
+argument-hint: '[file, function, or line]'
 user-invocable: true
 ---
 
@@ -12,6 +12,7 @@ Run `git blame` (or `git log -L`) on the target file, function, or line in $ARGU
 With the SHA in hand, look up the linked agent session via the `memory_commit_lookup` MCP tool with `sha: "<full-sha>"`. If the MCP tool is unavailable, fall back to HTTP: `GET $AGENTMEMORY_URL/agentmemory/session/by-commit?sha=<sha>` with `Authorization: Bearer $AGENTMEMORY_SECRET` when the secret is set.
 
 Present the result as:
+
 - The commit SHA, short SHA, branch, author, message
 - The linked session(s): id, project, started/ended timestamps, observation count, summary if any
 - A short list of the most important observations from that session (importance >= 7) when available via `memory_recall`

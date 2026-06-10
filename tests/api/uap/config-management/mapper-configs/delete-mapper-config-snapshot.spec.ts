@@ -187,10 +187,14 @@ test.describe('DELETE /mappers/{mapperConfigId}/snapshots/{snapshotId}', () => {
                 responseFields: [],
             })
 
-            const snap2 = await createMapperSnapshot(workerAuthedRequest, mc2.id, {
-                requestFields: [],
-                responseFields: [],
-            })
+            const snap2 = await createMapperSnapshot(
+                workerAuthedRequest,
+                mc2.id,
+                {
+                    requestFields: [],
+                    responseFields: [],
+                }
+            )
             snapshot2Id = snap2.id
         })
 
@@ -258,7 +262,8 @@ test.describe('DELETE /mappers/{mapperConfigId}/snapshots/{snapshotId}', () => {
     })
 
     // ─── 3. Successful soft delete — 200 + side effects ──────────────────────
-    test.describe.serial('3. Successful soft delete — 200 + side effects', () => {
+    test.describe
+        .serial('3. Successful soft delete — 200 + side effects', () => {
         let mapperConfigId!: string
         let deletedSnapshotId!: string
 
@@ -354,10 +359,14 @@ test.describe('DELETE /mappers/{mapperConfigId}/snapshots/{snapshotId}', () => {
 
             // Create two snapshots — API auto-sets the newest as active.
             // The first snapshot becomes non-active once the second is created.
-            const first = await createMapperSnapshot(workerAuthedRequest, mapperConfigId, {
-                requestFields: [],
-                responseFields: [],
-            })
+            const first = await createMapperSnapshot(
+                workerAuthedRequest,
+                mapperConfigId,
+                {
+                    requestFields: [],
+                    responseFields: [],
+                }
+            )
             deletedSnapshotId = first.id
 
             // Creating a second snapshot makes the first one non-active
@@ -381,9 +390,14 @@ test.describe('DELETE /mappers/{mapperConfigId}/snapshots/{snapshotId}', () => {
         test('TC-3.2 — Soft-deleted snapshot is excluded from GET /mappers/{id}/snapshots', async ({
             workerAuthedRequest,
         }) => {
-            const snapshots = await getMapperSnapshots(workerAuthedRequest, mapperConfigId)
+            const snapshots = await getMapperSnapshots(
+                workerAuthedRequest,
+                mapperConfigId
+            )
 
-            expect(snapshots.find((s) => s.id === deletedSnapshotId)).toBeUndefined()
+            expect(
+                snapshots.find((s) => s.id === deletedSnapshotId)
+            ).toBeUndefined()
         })
 
         test('TC-3.3 — Re-deleting a soft-deleted snapshot returns 404', async ({
@@ -413,7 +427,8 @@ test.describe('DELETE /mappers/{mapperConfigId}/snapshots/{snapshotId}', () => {
     })
 
     // ─── 4. Block delete — snapshot is the active snapshot ───────────────────
-    test.describe.serial('4. Block delete — snapshot is the active snapshot', () => {
+    test.describe
+        .serial('4. Block delete — snapshot is the active snapshot', () => {
         let mapperConfigId!: string
         let activeSnapshotId!: string
 
@@ -507,10 +522,14 @@ test.describe('DELETE /mappers/{mapperConfigId}/snapshots/{snapshotId}', () => {
             )
             mapperConfigId = mc.id
 
-            const snap = await createMapperSnapshot(workerAuthedRequest, mapperConfigId, {
-                requestFields: [],
-                responseFields: [],
-            })
+            const snap = await createMapperSnapshot(
+                workerAuthedRequest,
+                mapperConfigId,
+                {
+                    requestFields: [],
+                    responseFields: [],
+                }
+            )
             activeSnapshotId = snap.id
 
             // Set the snapshot as active so deleting it should be blocked

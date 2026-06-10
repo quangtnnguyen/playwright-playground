@@ -29,7 +29,7 @@ export const getIntegrators = async (
 export const createIntegrator = async (
     ctx: APIRequestContext,
     payload: CreateIntegratorPayload,
-    autoTrack?: string,
+    autoTrack?: string
 ): Promise<{ id: string }> => {
     const res = await ctx.post(BASE, { data: payload })
     if (!res.ok()) {
@@ -39,7 +39,12 @@ export const createIntegrator = async (
     }
     const result = (await res.json()) as { id: string }
     if (autoTrack) {
-        trackResource({ id: result.id, type: 'integrator', description: payload.name, spec: autoTrack })
+        trackResource({
+            id: result.id,
+            type: 'integrator',
+            description: payload.name,
+            spec: autoTrack,
+        })
     }
     return result
 }

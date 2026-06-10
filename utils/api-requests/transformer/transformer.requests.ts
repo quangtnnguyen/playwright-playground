@@ -17,11 +17,13 @@ const BASE = '/transformers/v1'
 
 /** GET /transformers/v1/health — no auth required */
 export const getTransformerHealth = async (
-    ctx: APIRequestContext,
+    ctx: APIRequestContext
 ): Promise<TransformerHealthResponse> => {
     const res = await ctx.get(`${BASE}/health`)
     if (!res.ok())
-        throw new Error(`getTransformerHealth failed (${res.status()}): ${await res.text()}`)
+        throw new Error(
+            `getTransformerHealth failed (${res.status()}): ${await res.text()}`
+        )
     return res.json()
 }
 
@@ -33,12 +35,14 @@ export const getTransformerHealth = async (
  */
 export const getTransformers = async (
     ctx: APIRequestContext,
-    id?: string,
+    id?: string
 ): Promise<GetTransformersResponse> => {
     const params = id ? `?id=${encodeURIComponent(id)}` : ''
     const res = await ctx.get(`${BASE}/configs${params}`)
     if (!res.ok())
-        throw new Error(`getTransformers failed (${res.status()}): ${await res.text()}`)
+        throw new Error(
+            `getTransformers failed (${res.status()}): ${await res.text()}`
+        )
     return res.json()
 }
 
@@ -51,14 +55,21 @@ export const getTransformers = async (
 export const createTransformer = async (
     ctx: APIRequestContext,
     payload: CreateTransformerPayload,
-    autoTrack?: string,
+    autoTrack?: string
 ): Promise<CreateTransformerResponse> => {
     const res = await ctx.post(`${BASE}/configs`, { data: payload })
     if (!res.ok())
-        throw new Error(`createTransformer failed (${res.status()}): ${await res.text()}`)
+        throw new Error(
+            `createTransformer failed (${res.status()}): ${await res.text()}`
+        )
     const result = (await res.json()) as CreateTransformerResponse
     if (autoTrack) {
-        trackResource({ id: result.id, type: 'transformer', description: payload.name, spec: autoTrack })
+        trackResource({
+            id: result.id,
+            type: 'transformer',
+            description: payload.name,
+            spec: autoTrack,
+        })
     }
     return result
 }
@@ -67,11 +78,15 @@ export const createTransformer = async (
 export const updateTransformer = async (
     ctx: APIRequestContext,
     transformerId: string,
-    payload: UpdateTransformerPayload,
+    payload: UpdateTransformerPayload
 ): Promise<UpdateTransformerResponse> => {
-    const res = await ctx.put(`${BASE}/configs/${transformerId}`, { data: payload })
+    const res = await ctx.put(`${BASE}/configs/${transformerId}`, {
+        data: payload,
+    })
     if (!res.ok())
-        throw new Error(`updateTransformer failed (${res.status()}): ${await res.text()}`)
+        throw new Error(
+            `updateTransformer failed (${res.status()}): ${await res.text()}`
+        )
     return res.json()
 }
 
@@ -83,7 +98,7 @@ export const updateTransformer = async (
  */
 export const deleteTransformer = async (
     ctx: APIRequestContext,
-    transformerId: string,
+    transformerId: string
 ): Promise<void> => {
     await ctx.delete(`${BASE}/configs/${transformerId}`)
 }
@@ -105,13 +120,15 @@ export const evaluateTransformer = async (
     ctx: APIRequestContext,
     transformerId: string,
     body: string,
-    params: EvaluateParams = {},
+    params: EvaluateParams = {}
 ): Promise<string> => {
     // Build URL-encoded parameters string
     const paramParts: string[] = []
     for (const [key, val] of Object.entries(params)) {
         if (val !== undefined) {
-            paramParts.push(`${encodeURIComponent(key)}=${encodeURIComponent(String(val))}`)
+            paramParts.push(
+                `${encodeURIComponent(key)}=${encodeURIComponent(String(val))}`
+            )
         }
     }
     const parametersValue = paramParts.join('&')
@@ -123,7 +140,9 @@ export const evaluateTransformer = async (
         },
     })
     if (!res.ok())
-        throw new Error(`evaluateTransformer failed (${res.status()}): ${await res.text()}`)
+        throw new Error(
+            `evaluateTransformer failed (${res.status()}): ${await res.text()}`
+        )
     return res.text()
 }
 
@@ -137,13 +156,15 @@ export const evaluateTransformer = async (
  */
 export const parseXml = async (
     ctx: APIRequestContext,
-    xmlContent: string,
+    xmlContent: string
 ): Promise<ParseXmlResponse> => {
     const res = await ctx.post(`${BASE}/xml/parse`, {
         data: xmlContent,
         headers: { 'Content-Type': 'text/xml' },
     })
     if (!res.ok())
-        throw new Error(`parseXml failed (${res.status()}): ${await res.text()}`)
+        throw new Error(
+            `parseXml failed (${res.status()}): ${await res.text()}`
+        )
     return res.json()
 }

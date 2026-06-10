@@ -11,8 +11,7 @@ export const config = {
     baseUrl: process.env['BASE_URL'] ?? 'http://localhost:5000',
 
     /** Base URL of the proxy server (runtime request routing) */
-    proxyBaseUrl:
-        process.env['PROXY_BASE_URL'] ?? 'http://localhost:5001',
+    proxyBaseUrl: process.env['PROXY_BASE_URL'] ?? 'http://localhost:5001',
 
     /** Route prefix for the config management API (e.g. proxy-configs/v1) */
     configApiBasePath:
@@ -31,8 +30,7 @@ export const config = {
     authAudience: process.env['AUTH_AUDIENCE'] ?? '',
 
     /** Base URL of the fis-common-transformer API */
-    transformerBaseUrl:
-        process.env['TRANSFORMER_BASE_URL'] ?? '',
+    transformerBaseUrl: process.env['TRANSFORMER_BASE_URL'] ?? '',
 
     /** True when running in CI environment */
     isCI: Boolean(process.env['CI']),

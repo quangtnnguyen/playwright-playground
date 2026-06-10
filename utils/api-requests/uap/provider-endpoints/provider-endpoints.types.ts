@@ -34,8 +34,8 @@ export interface TransformerConfigPayload {
 }
 
 export interface CreateProviderEndpointPayload {
-    apiId: string,
-    apiVersionId: string,
+    apiId: string
+    apiVersionId: string
     name: string
     description: string
     endpoint: string

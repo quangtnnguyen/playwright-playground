@@ -34,7 +34,7 @@ export const getMapperConfigs = async (
 export const createMapperConfig = async (
     ctx: APIRequestContext,
     payload: CreateMapperConfigPayload,
-    autoTrack?: string,
+    autoTrack?: string
 ): Promise<{ id: string }> => {
     const res = await ctx.post(BASE, { data: payload })
     if (!res.ok()) {
